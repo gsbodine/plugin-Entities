@@ -21,11 +21,11 @@ class Entity extends Omeka_Record_AbstractRecord {
     public $first_name;
     public $middle_name;
     public $last_name;
-    public $email;
     public $institution;
+    public $user_id;
             
-    protected $_related = array('name'        => 'getName', 
-                                'User'        => 'getUser');
+    protected $_related = array('name' => 'getName', 
+                                'User' => 'getUser');
             
     /**
      * These are all the things that will cause saving an entity to fault
@@ -34,13 +34,13 @@ class Entity extends Omeka_Record_AbstractRecord {
      */
     protected function _validate()
     {        
-        if (!empty($this->email) && !Zend_Validate::is($this->email, 'EmailAddress')) {
+        /*if (!empty($this->email) && !Zend_Validate::is($this->email, 'EmailAddress')) {
             $this->addError('email', __('The email address provided is not valid.'));
         }
                 
         if (empty($this->first_name) && empty($this->last_name) and empty($this->institution)) {
             $this->addError('Name', __('The name for a person may not be completely blank.'));
-        }
+        }*/
     }
     
     /**
@@ -48,14 +48,12 @@ class Entity extends Omeka_Record_AbstractRecord {
      *
      * @return array
      */
-    protected function filterInput($input)
-    {
+    protected function filterInput($input) {
         $options = array('inputNamespace'=>'Omeka_Filter');
         
         $filters = array('first_name'  => 'StringTrim', 
                          'middle_name' => 'StringTrim', 
                          'last_name'   => 'StringTrim', 
-                         'email'       => 'StringTrim', 
                          'institution' => 'StringTrim');
             
         $filter = new Zend_Filter_Input($filters, null, $input, $options);
@@ -65,6 +63,22 @@ class Entity extends Omeka_Record_AbstractRecord {
         return $clean;
     }
     
+    public function getEntityByUser($user) {
+        $entity = $this->getTable('Entity')->find((int) $user->id);
+        return $entity;
+    }
+    
+    public function __get($property) {
+        $entity = $this->getEntity();
+        if (!($entity instanceof Entity)) {
+            throw new Omeka_Record_Exception(__("No Entity record available."));
+        }
+        if (isset($entity->$property)) {
+            return $entity->$property;
+        } else {
+            return parent::__get($property);
+        }
+    }
     /**
      * Combine the first, middle and last name fields to produce a full name
      * string.
@@ -82,8 +96,8 @@ class Entity extends Omeka_Record_AbstractRecord {
      */
     public function getUser()
     {
-        $id = (int) $this->id;
-        return $this->getDb()->getTable('User')->findByEntity($id);
+        $id = (int) $this->user_id;
+        return $this->getTable('User')->findByEntity($id);
     }
     
     /**
@@ -101,11 +115,11 @@ class Entity extends Omeka_Record_AbstractRecord {
         
         //Check if there is a user account associated with this
         
-        if ($user = $this->User) {
+        if ($user = $this->user_id) {
             $user->delete();
         }
         
-        $db = $this->getDb();
+        $db = get_db();
         
         //Remove all taggings associated with this entity
         $taggings = $db->getTable('Taggings')->findBy(array('entity' => $id));
@@ -135,7 +149,7 @@ class Entity extends Omeka_Record_AbstractRecord {
                 throw new Omeka_Record_Exception( __('Both of these Entities must be persistent in order to merge them.') );
             }
             
-            $db = $this->getDb();
+            $db = get_db();
             
             // These are the classes where foreign keys will be affected
             $joinClasses = array('EntitiesRelations'=>'entity_id', 
