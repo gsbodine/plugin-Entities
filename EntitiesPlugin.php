@@ -11,7 +11,8 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     
     protected $_hooks = array(
         'install',
-        'initialize'
+        'initialize',
+        'uninstall'
     );
     
     protected $_filters = array();
@@ -32,6 +33,7 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
             `last_name` text COLLATE utf8_unicode_ci,
             `email` text COLLATE utf8_unicode_ci,
             `institution` text COLLATE utf8_unicode_ci,
+            `user_id` int(10) unsigned,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         
@@ -65,6 +67,11 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     public function hookInitialize() {
         $this->setUp();
     }
+    
+    public function hookUninstall() {
+        // todo
+    }
+    
 }
 
 
