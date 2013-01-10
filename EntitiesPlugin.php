@@ -12,7 +12,8 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     protected $_hooks = array(
         'install',
         'initialize',
-        'uninstall'
+        'uninstall',
+        'after_save_item'
     );
     
     protected $_filters = array();
@@ -70,6 +71,28 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     
     public function hookUninstall() {
         // todo
+    }
+    
+    public function hookAfterSaveItem($args) {
+        $item = $args['record'];
+        $item_id = $item->id;
+        
+        $user = current_user();
+        
+        $entity = new Entity();
+        $e = $entity->getEntityByUserId($user->id);
+
+        $er = new EntitiesRelations;
+        $erp = new EntityRelationships;
+        
+        $er->entity_id = $e->id;
+        $er->relation_id = $item_id;
+        $rel = $erp->getRelationshipByName('modified');
+        $er->relationship_id = $rel->id;
+        $er->type = 'Item';
+        $er->time = Zend_Date::now()->toString('Y-M-d H:m:s');
+        $er->save();
+        
     }
     
 }

@@ -63,8 +63,8 @@ class Entity extends Omeka_Record_AbstractRecord {
         return $clean;
     }
     
-    public function getEntityByUser($user) {
-        $entity = $this->getTable('Entity')->find((int) $user->id);
+    public function getEntityByUserId($id) {
+        $entity = $this->getTable('Entity')->findBySql('user_id = ?', array($id),true);
         return $entity;
     }
     
@@ -97,7 +97,7 @@ class Entity extends Omeka_Record_AbstractRecord {
     public function getUser()
     {
         $id = (int) $this->user_id;
-        return $this->getTable('User')->findByEntity($id);
+        return $this->getTable('User')->findById($id);
     }
     
     /**

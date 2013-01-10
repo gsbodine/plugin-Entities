@@ -19,5 +19,16 @@
  */
 class EntityRelationships extends Omeka_Record_AbstractRecord {
     public $name;
-    public $description;    
+    public $description;
+    public $id;
+
+    public function getRelationshipByName($name) {
+        return $this->getTable('EntityRelationships')->findBySql('name = ?',array($name),true);
+
+    }
+    
+    public function getId() {
+        return $this->id;
+    }
+    
 }

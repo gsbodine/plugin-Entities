@@ -24,8 +24,7 @@ class EntitiesRelations extends Omeka_Record_AbstractRecord {
     public $type;
     public $time;
     
-    protected function _validate()
-    {
+    protected function _validate() {
         if (empty($this->type)) {
             $this->addError(__('Joins in the EntitiesRelations table must be given a polymorphic type'));
         }
@@ -35,8 +34,7 @@ class EntitiesRelations extends Omeka_Record_AbstractRecord {
         }
     }
     
-    protected function beforeInsert()
-    {
+    protected function beforeInsert() {
         $this->time = Zend_Date::now()->toString(self::DATE_FORMAT);
     }
 }
