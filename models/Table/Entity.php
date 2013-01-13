@@ -64,4 +64,5 @@ class Table_Entity extends Omeka_Db_Table {
                                          'e.institution') );
         }
     }
+   
 }

@@ -68,7 +68,7 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     }
     
     public function hookInitialize() {
-        //get_view()->addHelperPath(dirname(__FILE__) . '/helpers', 'Entities_View_Helper_');
+        get_view()->addHelperPath(dirname(__FILE__) . '/helpers', 'Entities_View_Helper_');
     }
     
     public function hookUninstall() {
@@ -103,39 +103,23 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
             array('controller' => 'index',
                     'action'     => 'favorite',
                     'module'     => 'entities',
-                    'page'       => '1'));//,
-           // array('page' => '\d+'));
+                    'page'       => '1'));
         $router->addRoute('favorite', $favRoute);
+        
+        $unfavRoute = new Zend_Controller_Router_Route(
+             'remove-favorite/:id',
+             array('controller'=> 'index',
+                 'action' => 'remove-favorite',
+                 'module' => 'entities',
+                 'page' => '1')
+        );
+        $router->addRoute('remove-favorite', $unfavRoute);
     }
     
     public function hookPublicItemsShow($args) {
-        $item = $args['item'];
-        $html = '<hr /><h4><i class="icon-heart"></i> Favorite</h4>';
-        
-        if ($this->_is_user_favorite($item)){
-            $html .= '<p><strong>This item is one of your favorites.</strong> <a href="/remove-favorite"'.$item->id.'" class="label label-important"><i class="icon-remove-sign"></i> Remove</a>';
-        } else {
-            $html .= $this->_show_item_favorite_link($item);
+        if (current_user()) {
+            get_view()->favorites()->showItemFavoriteLinks($args['item']);
         }
-        
-        echo $html;
-    }
-    
-    private function _is_user_favorite($item) {
-        $e = new Entity();
-        $entity = $e->getEntityByUserId(current_user()->id);
-        $erel = new EntityRelationships();
-        $rel = $erel->getRelationshipByName('favorite');
-        
-        $params = array('relation_id'=>$item->id,'entity_id'=>$entity->id,'relationship_id'=>$rel->id);
-        $er = $this->_db->getTable('EntitiesRelations')->findBy($params);
-        return $er;
-    }
-    
-    private function _show_item_favorite_link($item) {
-        $html = '<hr /><h4><i class="icon-heart"></i> Favorite</h4>';
-        $html .= '<a href="/favorite/'. $item->id . '" class="btn btn-danger"><i class="icon-heart"></i> Make this item one of my favorites</a>';
-        return $html;
     }
     
     

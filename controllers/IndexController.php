@@ -40,6 +40,18 @@ class Entities_IndexController extends Omeka_Controller_AbstractActionController
         }
         
     }
+    
+    public function removeFavoriteAction($item) {
+        $user = current_user();
+        
+        if ($user) {
+            $e = new Entity();
+            $entity = $e->getEntityFromUser($user);
+            $params = array('entity_id'=>$entity->id,'relation_id'=>$params['id']);
+            $fav = $this->_helper->db->getTable('EntitiesRelations')->findBy($params);
+            $fav->delete();
+        }
+    }
 }
 
 ?>

@@ -171,4 +171,26 @@ class Entity extends Omeka_Record_AbstractRecord {
             Zend_Debug::dump( $e );exit;
         }
     }
+    
+    public function getEntityFromUser($user) {
+        $e = new Entity;
+        $entity = $e->getEntityByUserId($user->id);
+        if (!$entity) {
+            $this->_createEntityFromUser($user);
+        } else {
+            return $entity;
+        }
+    }
+    
+    
+    /* PRIVATE FUNCTIONS */
+    
+    private function _createEntityFromUser($user){
+        $e = new Entity();
+        if (!$e->getEntityByUserId($user->id)){
+            $e->user_id = $user->id;
+            $e->save();
+        }
+        return $e;
+    }
 }
