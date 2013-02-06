@@ -20,7 +20,7 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
         $html = '<hr /><h4><i class="icon-heart"></i> Favorite</h4>';
         
         if ($this->_is_user_favorite($item)){
-            $html .= '<p><strong>This item is one of your favorites.</strong> <a href="/remove-favorite/"'.$item->id.'" class="label label-important pull-right"><i class="icon-remove-sign"></i> Un-favorite this item</a>';
+            $html .= '<p><span class="alert alert-danger"><i class="icon-heart"></i> This item is one of your favorites.</span> <a href="/remove-favorite/'.$item->id.'" class="label label-important pull-right"><i class="icon-remove-sign"></i> Un-favorite this item</a>';
         } else {
             $html .= $this->_show_item_favorite_link($item);
         }

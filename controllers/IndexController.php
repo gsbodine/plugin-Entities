@@ -33,24 +33,23 @@ class Entities_IndexController extends Omeka_Controller_AbstractActionController
             $er->type = 'Item';
             $er->time = Zend_Date::now()->toString('Y-M-d H:m:s');
             $er->save();
-            $this->redirect('/items/show/'.$params['id']);
-            //$this->_helper->redirector('show', 'items', $params['id'], array());
-        } else {
-            //todo redirect back to item show
         }
-        
+        $this->redirect('/items/show/'.$params['id']);
     }
     
-    public function removeFavoriteAction($item) {
+    public function removeFavoriteAction() {
         $user = current_user();
         
         if ($user) {
             $e = new Entity();
             $entity = $e->getEntityFromUser($user);
-            $params = array('entity_id'=>$entity->id,'relation_id'=>$params['id']);
-            $fav = $this->_helper->db->getTable('EntitiesRelations')->findBy($params);
-            $fav->delete();
-        }
+            $p = $this->_getAllParams();
+            $erp = new EntityRelationships();
+            $rel = $erp->getRelationshipByName('favorite');
+            $fav = $this->_helper->db->getTable('EntitiesRelations')->findBy($params=array('entity_id'=>$entity->id,'relation_id'=>$p['id'],'relationship_id'=>$rel->id,'type'=>'Item'),1,1);
+            $fav[0]->delete();
+        } 
+        $this->redirect('/items/show/'.$p['id']);
     }
 }
 
