@@ -20,7 +20,15 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
         $html = '<hr /><h4><i class="icon-heart"></i> Favorite</h4>';
         
         if ($this->_is_user_favorite($item)){
-            $html .= '<p><span class="alert alert-danger"><i class="icon-heart"></i> This item is one of your favorites.</span> <a href="/remove-favorite/'.$item->id.'" class="label label-important pull-right"><i class="icon-remove-sign"></i> Un-favorite this item</a>';
+            $html .= '<p><span class="alert alert-danger"><i class="icon-heart"></i> This item is one of your favorites.</span>';
+            $num = $this->_numberOfFavorited($item);
+            
+            $html .= '<div><br /><a href="/remove-favorite/'.$item->id.'" class="btn btn-small btn-danger"><i class="icon-remove-sign"></i> Un-favorite this item</a>';
+            if ($num > 1) {
+                $html .= '<span class="pull-right text-error"><small><i class="icon-heart-empty"></i> ' . $num . ' people have now favorited this item.</small></span></p>';
+            }
+            $html .= '</div>';
+            
         } else {
             $html .= $this->_show_item_favorite_link($item);
         }
@@ -49,6 +57,15 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
     private function _show_item_favorite_link($item) {
         $html = '<a href="/favorite/'. $item->id . '" class="btn btn-danger"><i class="icon-heart"></i> Make this item one of my favorites</a>';
         return $html;
+    }
+    
+    private function _numberOfFavorited($item) {
+        $er = new EntityRelationships();
+        $e = $er->getRelationshipByName('Favorite');
+        
+        $params = array('relationship_id'=>$e->id,'relation_id'=>$item->id);
+        $num = get_db()->getTable('EntitiesRelations')->findBy($params);
+        return count($num);
     }
     
 }
