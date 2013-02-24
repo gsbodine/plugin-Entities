@@ -35,6 +35,17 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
         echo $html;
     }
     
+    public function listMostFavoritedItems($db) {
+        $html = '<ul class="unstyled">';
+        $items = $this->_getMostFavoritedItems($db,10);
+        foreach ($items as $fave) {
+            $html .= '<li><i class="icon-star"></i> '. metadata($fave['item'], array('Dublin Core','Title')) .' (favorited '. $fave['faves'] .' times)</li>';
+        }
+        $html .= '</ul>';
+        
+        return $html;
+    }
+    
     /* PRIVATE FUNCTIONS */
     
     private function _is_user_favorite($item) {
@@ -66,6 +77,24 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
         $params = array('relationship_id'=>$e->id,'relation_id'=>$item->id);
         $num = get_db()->getTable('EntitiesRelations')->findBy($params);
         return count($num);
+    }
+    
+    private function _getMostFavoritedItems($db,$limit=null) {
+        $select = new Omeka_Db_Select($db);
+        $select->from(array('er'=>'entities_relations'), array('i.id','count(i.id) as faves'))
+                ->join(array('e'=>'entities'), "er.entity_id = e.id",array())
+                ->join(array('ers'=>'entity_relationships'), "ers.id = er.relationship_id", array())
+                ->join(array('i'=>'items'), "i.id = er.relation_id")
+            ->where("ers.name='favorite'")
+            ->group('i.id')
+            ->order('count(i.id) DESC')
+            ->limit($limit);;
+        $stmt = $select->query();
+        while ($row = $stmt->fetch()) {
+            $item = get_db()->getTable('Item')->find($row['id']);
+            $items[] = array('item'=>$item,'faves'=>$row['faves']);
+         }
+        return $items;
     }
     
 }
