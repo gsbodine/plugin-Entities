@@ -23,6 +23,7 @@ class Entity extends Omeka_Record_AbstractRecord {
     public $last_name;
     public $institution;
     public $user_id;
+    public $private;
             
     protected $_related = array('name' => 'getName', 
                                 'User' => 'getUser');

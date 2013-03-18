@@ -41,7 +41,7 @@ class Table_Entity extends Omeka_Db_Table {
     protected function _getColumnPairs()
     {
         return array('e.id', 'e.name' => new Zend_db_Expr( 
-            'CONCAT_WS(" ", e.first_name, e.middle_name, e.last_name, e.institution)'));
+            'CONCAT_WS(" ", e.first_name, e.middle_name, e.last_name, e.institution,e.private)'));
     }
 
     /**
@@ -61,7 +61,8 @@ class Table_Entity extends Omeka_Db_Table {
                                          'e.first_name', 
                                          'e.middle_name', 
                                          'e.last_name', 
-                                         'e.institution') );
+                                         'e.institution',
+                                         'e.private') );
         }
     }
    
