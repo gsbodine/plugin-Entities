@@ -14,7 +14,9 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
         'initialize',
         'uninstall',
         'after_save_item',
+        'before_save_user',
         'public_items_show',
+        'users_form',
         'define_routes'
     );
     
@@ -73,6 +75,54 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     
     public function hookUninstall() {
         // todo
+    }
+    
+    public function hookUsersForm($args) {
+        $form = $args['form'];
+        $entity = new Entity;
+        $entity = $entity->getEntityFromUser($args['user']);
+        $form->addElement('text','first_name',array(
+            'label' => __('First Name'),
+            'value'=> $entity->first_name,
+            'required' => false
+        ));
+        
+        $form->addElement('text','last_name',array(
+            'label' => __('Last Name'),
+            'value' => $entity->last_name,
+            'required' => false
+        ));
+        
+        
+        $form->addElement('text','institution',array(
+            'label' => __('Institution or Affiliation'),
+            'value' => $entity->institution,
+            'required' => false
+        ));
+        
+        $form->addElement('text','institution',array(
+            'label' => __('Institution or Affiliation'),
+            'value' => $entity->institution,
+            'required' => false
+        ));
+        
+        $form->removeElement('name');
+        $form->getElement('submit')->setOrder(12);
+        
+        $args['form'] = $form;
+        $args['entity'] = $entity;
+        return $args;
+    }
+    
+    public function hookBeforeSaveUser($args) {
+        //var_dump($args['record']); die();
+        $id = $args['record']['id'];
+        $e = new Entity;
+        $entity = $e->getEntityByUserId($id);
+        $entity->setPostData($args['post']);
+        $entity->save();
+        $args['record']['name'] = $entity->getName();
+        return $args;
     }
     
     public function hookAfterSaveItem($args) {
