@@ -55,7 +55,8 @@ class Entity extends Omeka_Record_AbstractRecord {
         $filters = array('first_name'  => 'StringTrim', 
                          'middle_name' => 'StringTrim', 
                          'last_name'   => 'StringTrim', 
-                         'institution' => 'StringTrim');
+                         'institution' => 'StringTrim',
+                         'private'     => 'Boolean');
             
         $filter = new Zend_Filter_Input($filters, null, $input, $options);
 
