@@ -36,15 +36,20 @@ class Entities_View_Helper_Favorites extends Zend_View_Helper_Abstract {
     }
     
     public function listMostFavoritedItems($db) {
-        $html = '<ol class="unstyled">';
-        $items = $this->_getMostFavoritedItems($db,10);
+        $html = '<div class="faves-list">';
+        $items = $this->_getMostFavoritedItems($db,5);
        
         foreach ($items as $fave) {
             $item = get_db()->getTable('Item')->find($fave['item_id']);
-            $html .= '<li><i class="icon-star"></i> <a href="' . record_url($item) . '">'. metadata($item, array('Dublin Core','Title')) . '</a> - Document #' . $item->id .' (favorited '. $fave['faves'] .' times)</li>';
+            //$html .= '<li><i class="icon-star"></i> <a href="' . record_url($item) . '">'. metadata($item, array('Dublin Core','Title')) . '</a> - Document #' . $item->id .' (favorited '. $fave['faves'] .' times)</li>';
+            if (metadata($item, 'has thumbnail')) {
+                $html .= '<div class="row" style="margin-bottom: 5px;">';
+                $html .= '<div class="span1">' . link_to_item(item_image('square_thumbnail', array('class'=>'img-polaroid'), 0, $item),array(), 'show', $item) . '</div>'; 
+                $html .= '<div class="span5"><p style="padding-top: 5px"><strong>' . link_to($item, 'show', metadata($item, array('Dublin Core','Title'))) . '</strong></p><p class="muted">Document #' . $item->id .' (favorited '. $fave['faves'] .' times)</p></div>';
+                $html .= '</div>';
+            }
         }
-        $html .= '</ol>';
-        
+        $html .= '</div>';
         return $html;
     }
     
