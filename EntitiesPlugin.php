@@ -115,13 +115,17 @@ class EntitiesPlugin extends Omeka_Plugin_AbstractPlugin {
     }
     
     public function hookBeforeSaveUser($args) {
-        //var_dump($args['record']); die();
         $id = $args['record']['id'];
         $e = new Entity;
         $entity = $e->getEntityByUserId($id);
-        $entity->setPostData($args['post']);
+        if (!$entity) {
+            $entity = new Entity;
+            $entity->user_id = $args['record']['id'];
+        }
+        $entity->setPostData($_POST);
         $entity->save();
         $args['record']['name'] = $entity->getName();
+        
         return $args;
     }
     
